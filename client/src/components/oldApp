@@ -1,0 +1,110 @@
+import React from 'react';
+import axios from 'axios';
+
+const {useState, useEffect} = React;
+
+const App = (props) => {
+
+  const getMovies = () => {
+    axios.get("/movies")
+      .then(function (response) {
+        setMovies(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+  };
+
+  useEffect (function () {
+    getMovies();
+  }, [movies])
+
+  const [movies, setMovies] = useState([]);
+  const [customList, setCustomList] = useState([]);
+
+  function AddToCustom(newMovie) {
+    // setCustomList([...customList, {title: newMovie}])
+    for (let i = 0; i < movies.length; i++) {
+      if (newMovie === movies[i].title) {
+        break;
+      } else if (i === movies.length - 1){
+        setMovies([...movies, {title: newMovie}])
+      }
+    }
+  }
+
+  function SearchMovies(input) {
+    for (let i = 0; i < movies.length; i++) {
+      if (input.toString() === movies[i].title) {
+        return setMovies([movies[i]])
+      } else if (i === movies.length - 1){
+        getMovies();
+      }
+    }
+  }
+
+  return (
+   <div>
+    <h1 style={{borderBottom: "solid"}}>MovieList!</h1>
+    <AddMovies setCustomListFn={AddToCustom}/>
+    <SearchBar searchMoviesFn={SearchMovies} movies={movies}/>
+    <MovieList movies={movies}/>
+   </div>
+  )
+};
+
+const AddMovies = ({setCustomListFn}) => {
+  const [addInput, setAddInput] = useState('')
+  let setCustomMovies = function(event) {
+    event.preventDefault()
+    setCustomListFn(addInput)
+  }
+
+  return (
+    <div className="search-bar" style={{padding:10}}>
+      <input
+        style={{padding: 5}}
+        className="for-control"
+        type="text"
+        placeholder="Add movie titles here"
+        value={addInput}
+        onChange={(event) => setAddInput(event.target.value)}/>
+      <button
+        style={{padding: 5}}
+        className="btn"
+        onClick={setCustomMovies}>
+        ADD
+      </button>
+    </div>
+  )
+}
+
+
+const SearchBar = ({searchMoviesFn, movies}) => {
+  const [searchInput, setInput] = useState('')
+  return (
+  <div className="search-bar" style={{padding:10}}>
+    <input style={{padding: 5}} className="form-control" placeholder="Search..." type="text" value={searchInput}
+    onChange={(event) => setInput(event.target.value)}/>
+    <button style={{padding: 5}} className="btn" onClick={(event) => searchMoviesFn(searchInput)}>
+      "Go!"
+    </button>
+  </div>
+)}
+
+const MovieList = ({movies}) => {
+  return (
+    <ul>
+      {movies.map((movieItem) => {
+        return (
+          <li style={{listStyleType:"none", border: "solid", padding: 20}}
+          key ={movieItem.title}>
+          {movieItem.title}
+        </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+export default App;

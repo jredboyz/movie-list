@@ -1,0 +1,9 @@
+CREATE DATABASE movielist;
+
+USE movielist;
+
+CREATE TABLE movies (
+  id INTEGER(11) NOT NULL AUTO_INCREMENT,
+  title CHAR(100),
+  PRIMARY KEY(id)
+);
